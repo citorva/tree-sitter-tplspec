@@ -38,10 +38,7 @@ module.exports = grammar({
 
     rules: {
         module: $ => seq(
-            optional(seq(
-                repeat1($.decorator), // Module-level decorators
-                $._newline,
-            )),
+            repeat($._module_decorator),
             repeat($._statement),
         ),
 
@@ -116,6 +113,11 @@ module.exports = grammar({
             $.enum_block,
             $.struct_block,
         ),
+        
+        _decorated_definition: $ => seq(
+            repeat1($.decorator),
+            field('definition', $._container_definition),
+        ),
 
         _container_repr: $ => seq(
             '(',
@@ -131,39 +133,39 @@ module.exports = grammar({
             ':',
             $._newline,
             $._indent,
-            field('body', $._type_body),
+            $._type_body,
             $._dedent,
         ),
 
         _type_body: $ => repeat1(choice(
-            $._filter_declaration,
-            $._decorated_filter_declaration,
-            $._condition_declaration,
-            $._decorated_condition_declaration,
+            $.filter_declaration,
+            $.decorated_filter_declaration,
+            $.condition_declaration,
+            $.decorated_condition_declaration,
         )),
 
-        _filter_declaration: $ => seq(
+        filter_declaration: $ => seq(
             'filter',
             field('name', $.identifier),
-            $._argument_block,
+            $._parameter_block,
             '->',
-            field('return', $.optional_type),
+            field('return', $._maybe_option),
         ),
 
-        _decorated_filter_declaration: $ => seq(
+        decorated_filter_declaration: $ => seq(
             repeat1($.decorator),
-            $._filter_declaration,
+            $.filter_declaration,
         ),
 
-        _condition_declaration: $ => seq(
+        condition_declaration: $ => seq(
             'condition',
             field('name', $.identifier),
-            $._argument_block,
+            $._parameter_block,
         ),
 
-        _decorated_condition_declaration: $ => seq(
+        decorated_condition_declaration: $ => seq(
             repeat1($.decorator),
-            $._condition_declaration,
+            $.condition_declaration,
         ),
 
         // ENUM
@@ -174,26 +176,30 @@ module.exports = grammar({
             ':',
             $._newline,
             $._indent,
-            field('body', $._enum_body),
+            $._enum_body,
             $._dedent,
         ),
 
         _enum_body: $ => repeat1(choice(
-            $._enum_case,
-            $._decorated_enum_case,
+            $.enum_case,
+            $.decorated_enum_case,
+            $.filter_declaration,
+            $.decorated_filter_declaration,
+            $.condition_declaration,
+            $.decorated_condition_declaration,
         )),
 
-        _enum_case: $ => seq(
-            $.identifier,
+        enum_case: $ => seq(
+            field("case", $.identifier),
             optional(seq(
                 '=',
-                $._literal,
+                field("value", $.literal),
             )),
         ),
 
-        _decorated_enum_case: $ => seq(
+        decorated_enum_case: $ => seq(
             repeat1($.decorator),
-            $._enum_case,
+            $.enum_case,
         ),
 
         // STRUCT
@@ -203,24 +209,28 @@ module.exports = grammar({
             ':',
             $._newline,
             $._indent,
-            field('body', $._struct_body),
+            $._struct_body,
             $._dedent,
         ),
 
         _struct_body: $ => repeat1(choice(
-            $._struct_field,
-            $._decorated_struct_field,
+            $.struct_field,
+            $.decorated_struct_field,
+            $.filter_declaration,
+            $.decorated_filter_declaration,
+            $.condition_declaration,
+            $.decorated_condition_declaration,
         )),
 
-        _struct_field: $ => seq(
+        struct_field: $ => seq(
             $.identifier,
             ':',
-            $.optional_type,
+            $._maybe_option,
         ),
 
-        _decorated_struct_field: $ => seq(
+        decorated_struct_field: $ => seq(
             repeat1($.decorator),
-            $._struct_field,
+            $.struct_field,
         ),
         /**********************************************************************/
         /* END blocks                                                         */
@@ -229,20 +239,22 @@ module.exports = grammar({
         /**********************************************************************/
         /* BEGIN decorated                                                    */
         /**********************************************************************/
-        _decorated_definition: $ => seq(
-            repeat1($.decorator),
-            field('definition', $._container_definition),
+        _module_decorator: $ => seq(
+            field("module_decorator", $.decorator),
+            $._newline,
         ),
 
         decorator: $ => seq(
             '@',
-            $._decorator_expression,
+            field('function', $.dotted_name),
+            optional(field('argument', $._argument_block)),
             $._newline,
         ),
 
-        _decorator_expression: $ => seq(
-            field('function', $.primary_expression),
-            optional(field('arguments', $.argument_list)),
+        _argument_block: $ => seq(
+            '(',
+            $.argument_list,
+            ')',
         ),
         /**********************************************************************/
         /* END decorated                                                      */
@@ -296,13 +308,15 @@ module.exports = grammar({
             ']',
         ),
 
-        optional_type: $ => choice(
+        option: $ => seq(
             $.type,
-            seq(
-                $.type,
-                '|',
-                $.none,
-            ),
+            '|',
+            'None',
+        ),
+
+        _maybe_option: $ => choice(
+            $.type,
+            $.option,
         ),
 
         _builtin_types: _ => choice(
@@ -313,14 +327,7 @@ module.exports = grammar({
             'natural'
         ),
 
-        primary_expression: $ => $._literal,
-
-        argument_list: $ => seq(
-            '(',
-            optional(commaSep1($.expression)),
-            optional(','),
-            ')',
-        ),
+        primary_expression: $ => $.literal,
 
         expression: $ => choice(
             $.comparison_operator,
@@ -328,20 +335,6 @@ module.exports = grammar({
             $.boolean_operator,
             $.named_expression,
         ),
-
-        expression_list: $ => prec.right(seq(
-            $.expression,
-            choice(
-                ',',
-                seq(
-                    repeat1(seq(
-                        ',',
-                        $.expression,
-                    )),
-                    optional(','),
-                ),
-            ),
-        )),
 
         named_expression: $ => seq(
             field('name', $.identifier),
@@ -387,33 +380,49 @@ module.exports = grammar({
             field('argument', $.expression),
         )),
 
-        argument: $ => seq(
-            field('name', $.identifier),
-            ':',
-            $.optional_type,
-            optional(seq(
-                '=',
-                $._literal,
-            )),
+        argument: $ => choice(
+            $.expression,
+            $.literal,
         ),
 
         argument_list: $ => prec.right(seq(
             $.argument,
+            seq(
+                repeat(seq(
+                    ',',
+                    $.argument,
+                )),
+                optional(','),
+            ),
+        )),
+
+        parameter: $ => seq(
+            field('name', $.identifier),
+            ':',
+            $._maybe_option,
+            optional(seq(
+                '=',
+                $.literal,
+            )),
+        ),
+
+        parameter_list: $ => prec.right(seq(
+            $.parameter,
             choice(
                 ',',
                 seq(
                     repeat1(seq(
                         ',',
-                        $.argument,
+                        $.parameter,
                     )),
                     optional(','),
                 ),
             ),
         )),
 
-        _argument_block: $ => seq(
+        _parameter_block: $ => seq(
             '(',
-            optional($.argument_list),
+            optional($.parameter_list),
             ')',
         ),
 
@@ -425,7 +434,7 @@ module.exports = grammar({
         /* BEGIN literals                                                     */
         /**********************************************************************/
 
-        _literal: $ => choice(
+        literal: $ => choice(
             $.string,
             $.concatenated_string,
             $.integer,
@@ -433,12 +442,12 @@ module.exports = grammar({
             $.true,
             $.false,
             $.none,
-            field('enum', $.identifier),
+            $.dotted_name,
         ),
 
         string: $ => seq(
             $.string_start,
-            repeat($.string_content),
+            $.string_content,
             $.string_end,
         ),
 
@@ -454,7 +463,7 @@ module.exports = grammar({
             $._string_content,
         ))),
 
-        escape_sequence: $ => token.immediate(prec(1, seq(
+        escape_sequence: _ => token.immediate(prec(1, seq(
             '\\',
             choice(
                 /u[a-fA-F\d]{4}/,
