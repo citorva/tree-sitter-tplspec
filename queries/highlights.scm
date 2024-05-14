@@ -7,8 +7,8 @@
 
 (argument) @property
 
-(type_block repr: (identifier) @type)
-(enum_block repr: (identifier) @type)
+(type_block repr: (type) @type)
+(enum_block repr: (type) @type)
 (type) @type
 (option) @type
 
