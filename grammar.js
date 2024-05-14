@@ -121,7 +121,7 @@ module.exports = grammar({
 
         _container_repr: $ => seq(
             '(',
-            $.identifier,
+            $.type,
             ')',
         ),
         
@@ -271,34 +271,30 @@ module.exports = grammar({
 
         type: $ => choice(
             $.identifier,
-            $._builtin_types,
-            $._list_type,
-            $._tuple_type,
-            $._map_type,
+            $.builtin_types,
+            $.list_type,
+            $.tuple_type,
+            $.map_type,
         ),
 
-        _list_type: $ => seq(
+        list_type: $ => seq(
             'list',
             '[',
             $.type,
             ']'
         ),
 
-        _tuple_type: $ => seq(
+        tuple_type: $ => seq(
             'tuple',
             '[',
             seq(
-                $.type,
-                repeat(seq(
-                    ',',
-                    $.type,
-                )),
+                commaSep1($.type),
                 optional(','),
             ),
             ']',
         ),
 
-        _map_type: $ => seq(
+        map_type: $ => seq(
             'map',
             '[',
             seq(
@@ -320,7 +316,7 @@ module.exports = grammar({
             $.option,
         ),
 
-        _builtin_types: _ => choice(
+        builtin_types: _ => choice(
             'string',
             'bool',
             'unsigned',
@@ -393,14 +389,8 @@ module.exports = grammar({
         ),
 
         argument_list: $ => prec.right(seq(
-            $.argument,
-            seq(
-                repeat(seq(
-                    ',',
-                    $.argument,
-                )),
-                optional(','),
-            ),
+            commaSep1($.argument),
+            optional(','),
         )),
 
         parameter: $ => seq(
@@ -414,17 +404,8 @@ module.exports = grammar({
         ),
 
         parameter_list: $ => prec.right(seq(
-            $.parameter,
-            choice(
-                ',',
-                seq(
-                    repeat1(seq(
-                        ',',
-                        $.parameter,
-                    )),
-                    optional(','),
-                ),
-            ),
+            commaSep1($.parameter),
+            optional(','),
         )),
 
         _parameter_block: $ => seq(
