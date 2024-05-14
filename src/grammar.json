@@ -1362,27 +1362,27 @@
       "members": [
         {
           "type": "STRING",
-          "value": "String"
+          "value": "string"
         },
         {
           "type": "STRING",
-          "value": "Boolean"
+          "value": "boolean"
         },
         {
           "type": "STRING",
-          "value": "Unsigned"
+          "value": "unsigned"
         },
         {
           "type": "STRING",
-          "value": "Integer"
+          "value": "integer"
         },
         {
           "type": "STRING",
-          "value": "Natural"
+          "value": "natural"
         },
         {
           "type": "STRING",
-          "value": "None"
+          "value": "none"
         }
       ]
     },

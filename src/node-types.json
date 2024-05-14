@@ -949,11 +949,6 @@
     }
   },
   {
-    "type": "none",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "not_operator",
     "named": true,
     "fields": {
@@ -1380,30 +1375,6 @@
     "named": false
   },
   {
-    "type": "Boolean",
-    "named": false
-  },
-  {
-    "type": "Integer",
-    "named": false
-  },
-  {
-    "type": "Natural",
-    "named": false
-  },
-  {
-    "type": "None",
-    "named": false
-  },
-  {
-    "type": "String",
-    "named": false
-  },
-  {
-    "type": "Unsigned",
-    "named": false
-  },
-  {
     "type": "[",
     "named": false
   },
@@ -1417,6 +1388,10 @@
   },
   {
     "type": "as",
+    "named": false
+  },
+  {
+    "type": "boolean",
     "named": false
   },
   {
@@ -1476,6 +1451,10 @@
     "named": true
   },
   {
+    "type": "integer",
+    "named": false
+  },
+  {
     "type": "is",
     "named": false
   },
@@ -1496,6 +1475,18 @@
     "named": false
   },
   {
+    "type": "natural",
+    "named": false
+  },
+  {
+    "type": "none",
+    "named": false
+  },
+  {
+    "type": "none",
+    "named": true
+  },
+  {
     "type": "not",
     "named": false
   },
@@ -1505,6 +1496,10 @@
   },
   {
     "type": "or",
+    "named": false
+  },
+  {
+    "type": "string",
     "named": false
   },
   {
@@ -1529,6 +1524,10 @@
   },
   {
     "type": "type",
+    "named": false
+  },
+  {
+    "type": "unsigned",
     "named": false
   },
   {

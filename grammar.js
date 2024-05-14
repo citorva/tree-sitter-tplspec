@@ -387,12 +387,12 @@ module.exports = grammar({
         ),
 
         builtin_types: _ => choice(
-            'String',
-            'Boolean',
-            'Unsigned',
-            'Integer',
-            'Natural',
-            'None',
+            'string',
+            'boolean',
+            'unsigned',
+            'integer',
+            'natural',
+            'none',
         ),
 
         primary_expression: $ => $.literal,

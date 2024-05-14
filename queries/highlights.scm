@@ -69,3 +69,14 @@
   "condition"
   "filter"
 ] @keyword
+
+[
+  "map"
+  "array"
+  "tuple"
+  "boolean"
+  "integer"
+  "natural"
+  "none"
+  "string"
+] @type.builtin
