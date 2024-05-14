@@ -6,6 +6,12 @@ const PREC = {
 
 module.exports = grammar({
     name: 'tplspec',
+
+    extras: $ => [
+        $.comment,
+        /[\s\f\uFEFF\u2060\u200B]|\r?\n/,
+        $.line_continuation,
+    ],
     
     externals: $ => [
         $._newline,
@@ -32,8 +38,10 @@ module.exports = grammar({
 
     rules: {
         module: $ => seq(
-            repeat($.decorator), // Module-level decorators
-            $._newline,
+            optional(seq(
+                repeat1($.decorator), // Module-level decorators
+                $._newline,
+            )),
             repeat($._statement),
         ),
 
@@ -121,6 +129,7 @@ module.exports = grammar({
             field('name', $.identifier),
             optional(field('repr', $._container_repr)),
             ':',
+            $._newline,
             $._indent,
             field('body', $._type_body),
             $._dedent,
@@ -163,6 +172,7 @@ module.exports = grammar({
             field('name', $.identifier),
             optional(field('repr', $._container_repr)),
             ':',
+            $._newline,
             $._indent,
             field('body', $._enum_body),
             $._dedent,
@@ -191,6 +201,7 @@ module.exports = grammar({
             'struct',
             field('name', $.identifier),
             ':',
+            $._newline,
             $._indent,
             field('body', $._struct_body),
             $._dedent,
@@ -464,6 +475,8 @@ module.exports = grammar({
         none: _ => 'None',
 
         comment: _ => token(seq('#', /.*/)),
+
+        line_continuation: _ => token(seq('\\', choice(seq(optional('\r'), '\n'), '\0'))),
 
         /**********************************************************************/
         /* END literals                                                       */
