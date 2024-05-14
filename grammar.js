@@ -305,7 +305,6 @@ module.exports = grammar({
                 $.type,
                 ',',
                 $.type,
-                optional(','),
             ),
             ']',
         ),
