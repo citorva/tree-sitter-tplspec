@@ -171,7 +171,7 @@ module.exports = grammar({
             field('name', $.identifier),
             $._parameter_block,
             '->',
-            field('return', $._maybe_option),
+            field('return', $._maybe_inline_variant),
         ),
 
         condition_declaration: $ => seq(
@@ -265,7 +265,7 @@ module.exports = grammar({
         struct_field: $ => seq(
             $.identifier,
             ':',
-            $._maybe_option,
+            $._maybe_inline_variant,
         ),
 
         decorated_struct_field: $ => seq(
@@ -354,7 +354,7 @@ module.exports = grammar({
         list_type: $ => seq(
             'list',
             '[',
-            $.type,
+            $._maybe_inline_variant,
             ']'
         ),
 
@@ -362,7 +362,7 @@ module.exports = grammar({
             'tuple',
             '[',
             seq(
-                commaSep1($.type),
+                commaSep1($._maybe_inline_variant),
                 optional(','),
             ),
             ']',
@@ -372,22 +372,18 @@ module.exports = grammar({
             'map',
             '[',
             seq(
-                $.type,
+                $._maybe_inline_variant,
                 ',',
-                $.type,
+                $._maybe_inline_variant,
             ),
             ']',
         ),
 
-        option: $ => seq(
-            $.type,
-            '|',
-            'None',
-        ),
+        inline_variant: $ => sep1($.type, '|'),
 
-        _maybe_option: $ => choice(
-            $.type,
-            $.option,
+        _maybe_inline_variant: $ => choice(
+            prec(1, $.type),
+            $.inline_variant,
         ),
 
         builtin_types: _ => choice(
@@ -395,7 +391,8 @@ module.exports = grammar({
             'bool',
             'unsigned',
             'integer',
-            'natural'
+            'natural',
+            'None',
         ),
 
         primary_expression: $ => $.literal,
@@ -470,7 +467,7 @@ module.exports = grammar({
         parameter: $ => seq(
             field('name', $.identifier),
             ':',
-            $._maybe_option,
+            $._maybe_inline_variant,
             optional(seq(
                 '=',
                 $.literal,
