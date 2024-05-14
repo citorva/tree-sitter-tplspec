@@ -10,7 +10,6 @@
 (type_block repr: (type) @type)
 (enum_block repr: (type) @type)
 (type) @type
-(option) @type
 
 ; Literals
 
