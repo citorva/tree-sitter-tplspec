@@ -209,6 +209,47 @@ module.exports = grammar({
             ),
         )),
 
+        /**********************************************************************/
+        /* END common                                                         */
+        /**********************************************************************/
+
+        /**********************************************************************/
+        /* BEGIN literals                                                     */
+        /**********************************************************************/
+
+        string: $ => seq(
+            $.string_start,
+            repeat($.string_content),
+            $.string_end,
+        ),
+
+        concatenated_string: $ => seq(
+            $.string,
+            repeat1($.string),
+        ),
+
+        string_content : $ => prec.right(repeat1(choice(
+            $.escape_interpolation,
+            $.escape_sequence,
+            $._not_escape_sequence,
+            $._string_content,
+        ))),
+
+        escape_sequence: $ => token.immediate(prec(1, seq(
+            '\\',
+            choice(
+                /u[a-fA-F\d]{4}/,
+                /U[a-fA-F\d]{8}/,
+                /x[a-fA-F\d]{2}/,
+                /\d{3}/,
+                /\r?\n/,
+                /['"abfrntv\\]/,
+                /N\{[^}]+\}/,
+            ),
+        ))),
+
+        _not_escape_sequence: _ => token.immediate('\\'),
+
         integer: _ => token(choice(
             seq(
                 choice('0x', '0X'),
@@ -253,48 +294,6 @@ module.exports = grammar({
         none: _ => 'None',
 
         comment: _ => token(seq('#', /.*/)),
-
-        /**********************************************************************/
-        /* END common                                                         */
-        /**********************************************************************/
-
-        /**********************************************************************/
-        /* BEGIN literals                                                     */
-        /**********************************************************************/
-
-        string: $ => seq(
-            $.string_start,
-            repeat($.string_content),
-            $.string_end,
-        ),
-
-
-        concatenated_string: $ => seq(
-            $.string,
-            repeat1($.string),
-        ),
-
-        string_content : $ => prec.right(repeat1(choice(
-            $.escape_interpolation,
-            $.escape_sequence,
-            $._not_escape_sequence,
-            $._string_content,
-        ))),
-
-        escape_sequence: $ => token.immediate(prec(1, seq(
-            '\\',
-            choice(
-                /u[a-fA-F\d]{4}/,
-                /U[a-fA-F\d]{8}/,
-                /x[a-fA-F\d]{2}/,
-                /\d{3}/,
-                /\r?\n/,
-                /['"abfrntv\\]/,
-                /N\{[^}]+\}/,
-            ),
-        ))),
-
-        _not_escape_sequence: _ => token.immediate('\\'),
 
         /**********************************************************************/
         /* END literals                                                       */
