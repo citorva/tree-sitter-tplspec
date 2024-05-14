@@ -501,6 +501,7 @@ module.exports = grammar({
 
         literal: $ => choice(
             $.string,
+            $.array,
             $.concatenated_string,
             $.integer,
             $.float,
@@ -508,6 +509,15 @@ module.exports = grammar({
             $.false,
             $.none,
             $.dotted_name,
+        ),
+
+        array: $ => seq(
+            '[',
+            optional(seq(
+                commaSep1($.literal),
+                optional(','),
+            )),
+            ']',
         ),
 
         string: $ => seq(
