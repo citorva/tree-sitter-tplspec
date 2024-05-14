@@ -740,26 +740,15 @@
           "value": "@"
         },
         {
-          "type": "FIELD",
-          "name": "function",
-          "content": {
-            "type": "SYMBOL",
-            "name": "dotted_name"
-          }
-        },
-        {
           "type": "CHOICE",
           "members": [
             {
-              "type": "FIELD",
-              "name": "argument",
-              "content": {
-                "type": "SYMBOL",
-                "name": "_argument_block"
-              }
+              "type": "SYMBOL",
+              "name": "call"
             },
             {
-              "type": "BLANK"
+              "type": "SYMBOL",
+              "name": "dotted_name"
             }
           ]
         },
@@ -1042,6 +1031,27 @@
         {
           "type": "SYMBOL",
           "name": "named_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "call"
+        }
+      ]
+    },
+    "call": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "name",
+          "content": {
+            "type": "SYMBOL",
+            "name": "dotted_name"
+          }
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_argument_block"
         }
       ]
     },

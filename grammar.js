@@ -246,8 +246,10 @@ module.exports = grammar({
 
         decorator: $ => seq(
             '@',
-            field('function', $.dotted_name),
-            optional(field('argument', $._argument_block)),
+            choice(
+                $.call,
+                $.dotted_name,
+            ),
             $._newline,
         ),
 
@@ -334,6 +336,12 @@ module.exports = grammar({
             $.not_operator,
             $.boolean_operator,
             $.named_expression,
+            $.call,
+        ),
+
+        call: $ => seq(
+            field('name', $.dotted_name),
+            $._argument_block,
         ),
 
         named_expression: $ => seq(
