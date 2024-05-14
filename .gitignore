@@ -1,0 +1,6 @@
+*
+
+!/corpus
+!/package.json
+!/grammar.js
+!/.gitignore
