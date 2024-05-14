@@ -113,8 +113,8 @@ module.exports = grammar({
 
         _container_definition: $ => choice(
             $.type_block,
-            // $.enum_block,
-            // $.struct_block,
+            $.enum_block,
+            $.struct_block,
         ),
 
         _container_repr: $ => seq(
@@ -258,6 +258,42 @@ module.exports = grammar({
         type: $ => choice(
             $.identifier,
             $._builtin_types,
+            $._list_type,
+            $._tuple_type,
+            $._map_type,
+        ),
+
+        _list_type: $ => seq(
+            'list',
+            '[',
+            $.type,
+            ']'
+        ),
+
+        _tuple_type: $ => seq(
+            'tuple',
+            '[',
+            seq(
+                $.type,
+                repeat(seq(
+                    ',',
+                    $.type,
+                )),
+                optional(','),
+            ),
+            ']',
+        ),
+
+        _map_type: $ => seq(
+            'map',
+            '[',
+            seq(
+                $.type,
+                ',',
+                $.type,
+                optional(','),
+            ),
+            ']',
         ),
 
         optional_type: $ => choice(
@@ -277,10 +313,7 @@ module.exports = grammar({
             'natural'
         ),
 
-        primary_expression: $ => choice(
-            $.identifier,
-            $._literal,
-        ),
+        primary_expression: $ => $._literal,
 
         argument_list: $ => seq(
             '(',
@@ -358,6 +391,10 @@ module.exports = grammar({
             field('name', $.identifier),
             ':',
             $.optional_type,
+            optional(seq(
+                '=',
+                $._literal,
+            )),
         ),
 
         argument_list: $ => prec.right(seq(
@@ -396,6 +433,7 @@ module.exports = grammar({
             $.true,
             $.false,
             $.none,
+            field('enum', $.identifier),
         ),
 
         string: $ => seq(
