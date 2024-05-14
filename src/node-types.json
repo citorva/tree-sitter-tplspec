@@ -238,7 +238,72 @@
     }
   },
   {
-    "type": "decorated_condition_declaration",
+    "type": "container_definition",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "doc_block",
+          "named": true
+        },
+        {
+          "type": "enum_block",
+          "named": true
+        },
+        {
+          "type": "struct_block",
+          "named": true
+        },
+        {
+          "type": "type_block",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "decorated_definition",
+    "named": true,
+    "fields": {
+      "definition": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "enum_block",
+            "named": true
+          },
+          {
+            "type": "struct_block",
+            "named": true
+          },
+          {
+            "type": "type_block",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "decorator",
+          "named": true
+        },
+        {
+          "type": "doc_block",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "decorated_enum_child",
     "named": true,
     "fields": {},
     "children": {
@@ -252,39 +317,13 @@
         {
           "type": "decorator",
           "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "decorated_enum_case",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
+        },
         {
-          "type": "decorator",
+          "type": "doc_block",
           "named": true
         },
         {
           "type": "enum_case",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "decorated_filter_declaration",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "decorator",
           "named": true
         },
         {
@@ -295,7 +334,7 @@
     }
   },
   {
-    "type": "decorated_struct_field",
+    "type": "decorated_struct_child",
     "named": true,
     "fields": {},
     "children": {
@@ -303,11 +342,50 @@
       "required": true,
       "types": [
         {
+          "type": "condition_declaration",
+          "named": true
+        },
+        {
           "type": "decorator",
           "named": true
         },
         {
+          "type": "doc_block",
+          "named": true
+        },
+        {
+          "type": "filter_declaration",
+          "named": true
+        },
+        {
           "type": "struct_field",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "decorated_type_child",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "condition_declaration",
+          "named": true
+        },
+        {
+          "type": "decorator",
+          "named": true
+        },
+        {
+          "type": "doc_block",
+          "named": true
+        },
+        {
+          "type": "filter_declaration",
           "named": true
         }
       ]
@@ -327,6 +405,40 @@
         },
         {
           "type": "dotted_name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "doc_block",
+    "named": true,
+    "fields": {
+      "summary": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": " ",
+            "named": false
+          },
+          {
+            "type": "##",
+            "named": false
+          },
+          {
+            "type": "doc_data",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "doc_data",
           "named": true
         }
       ]
@@ -385,27 +497,15 @@
       "required": true,
       "types": [
         {
-          "type": "condition_declaration",
+          "type": "decorated_enum_child",
           "named": true
         },
         {
-          "type": "decorated_condition_declaration",
+          "type": "enum_child",
           "named": true
         },
         {
-          "type": "decorated_enum_case",
-          "named": true
-        },
-        {
-          "type": "decorated_filter_declaration",
-          "named": true
-        },
-        {
-          "type": "enum_case",
-          "named": true
-        },
-        {
-          "type": "filter_declaration",
+          "type": "inner_doc_block",
           "named": true
         }
       ]
@@ -435,6 +535,33 @@
           }
         ]
       }
+    }
+  },
+  {
+    "type": "enum_child",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "condition_declaration",
+          "named": true
+        },
+        {
+          "type": "doc_block",
+          "named": true
+        },
+        {
+          "type": "enum_case",
+          "named": true
+        },
+        {
+          "type": "filter_declaration",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -578,6 +705,40 @@
     }
   },
   {
+    "type": "inner_doc_block",
+    "named": true,
+    "fields": {
+      "summary": {
+        "multiple": true,
+        "required": true,
+        "types": [
+          {
+            "type": " ",
+            "named": false
+          },
+          {
+            "type": "#!",
+            "named": false
+          },
+          {
+            "type": "doc_data",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "doc_data",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "list_type",
     "named": true,
     "fields": {},
@@ -654,24 +815,6 @@
     "type": "module",
     "named": true,
     "fields": {
-      "definition": {
-        "multiple": true,
-        "required": false,
-        "types": [
-          {
-            "type": "enum_block",
-            "named": true
-          },
-          {
-            "type": "struct_block",
-            "named": true
-          },
-          {
-            "type": "type_block",
-            "named": true
-          }
-        ]
-      },
       "module_decorator": {
         "multiple": true,
         "required": false,
@@ -688,11 +831,11 @@
       "required": false,
       "types": [
         {
-          "type": "decorator",
+          "type": "container_definition",
           "named": true
         },
         {
-          "type": "enum_block",
+          "type": "decorated_definition",
           "named": true
         },
         {
@@ -704,11 +847,7 @@
           "named": true
         },
         {
-          "type": "struct_block",
-          "named": true
-        },
-        {
-          "type": "type_block",
+          "type": "inner_doc_block",
           "named": true
         }
       ]
@@ -921,19 +1060,34 @@
       "required": true,
       "types": [
         {
+          "type": "decorated_struct_child",
+          "named": true
+        },
+        {
+          "type": "inner_doc_block",
+          "named": true
+        },
+        {
+          "type": "struct_child",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "struct_child",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
           "type": "condition_declaration",
           "named": true
         },
         {
-          "type": "decorated_condition_declaration",
-          "named": true
-        },
-        {
-          "type": "decorated_filter_declaration",
-          "named": true
-        },
-        {
-          "type": "decorated_struct_field",
+          "type": "doc_block",
           "named": true
         },
         {
@@ -1054,15 +1208,34 @@
       "required": true,
       "types": [
         {
+          "type": "decorated_type_child",
+          "named": true
+        },
+        {
+          "type": "inner_doc_block",
+          "named": true
+        },
+        {
+          "type": "type_child",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "type_child",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
           "type": "condition_declaration",
           "named": true
         },
         {
-          "type": "decorated_condition_declaration",
-          "named": true
-        },
-        {
-          "type": "decorated_filter_declaration",
+          "type": "doc_block",
           "named": true
         },
         {
@@ -1073,7 +1246,19 @@
     }
   },
   {
+    "type": " ",
+    "named": false
+  },
+  {
     "type": "!=",
+    "named": false
+  },
+  {
+    "type": "#!",
+    "named": false
+  },
+  {
+    "type": "##",
     "named": false
   },
   {
@@ -1169,6 +1354,10 @@
     "named": false
   },
   {
+    "type": "doc_data",
+    "named": true
+  },
+  {
     "type": "enum",
     "named": false
   },
@@ -1210,11 +1399,11 @@
   },
   {
     "type": "integer",
-    "named": true
+    "named": false
   },
   {
     "type": "integer",
-    "named": false
+    "named": true
   },
   {
     "type": "is",

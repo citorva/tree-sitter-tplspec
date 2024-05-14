@@ -38,6 +38,7 @@ module.exports = grammar({
 
     rules: {
         module: $ => seq(
+            optional($.inner_doc_block),
             repeat($._module_decorator),
             repeat($._statement),
         ),
@@ -104,8 +105,13 @@ module.exports = grammar({
         /* BEGIN blocks                                                       */
         /**********************************************************************/
         _compound_statement: $ => choice(
+            $.container_definition,
+            $.decorated_definition,
+        ),
+
+        container_definition: $ => seq(
+            optional($.doc_block),
             $._container_definition,
-            $._decorated_definition,
         ),
 
         _container_definition: $ => choice(
@@ -114,7 +120,8 @@ module.exports = grammar({
             $.struct_block,
         ),
         
-        _decorated_definition: $ => seq(
+        decorated_definition: $ => seq(
+            optional($.doc_block),
             repeat1($.decorator),
             field('definition', $._container_definition),
         ),
@@ -133,16 +140,31 @@ module.exports = grammar({
             ':',
             $._newline,
             $._indent,
+            optional($.inner_doc_block),
             $._type_body,
             $._dedent,
         ),
 
         _type_body: $ => repeat1(choice(
-            $.filter_declaration,
-            $.decorated_filter_declaration,
-            $.condition_declaration,
-            $.decorated_condition_declaration,
+            $.type_child,
+            $.decorated_type_child,
         )),
+
+        type_child: $ => seq(
+            optional($.doc_block),
+            $._type_child
+        ),
+
+        _type_child: $ => choice(
+            $.filter_declaration,
+            $.condition_declaration,
+        ),
+
+        decorated_type_child: $ => seq(
+            optional($.doc_block),
+            repeat1($.decorator),
+            $._type_child,
+        ),
 
         filter_declaration: $ => seq(
             'filter',
@@ -152,20 +174,10 @@ module.exports = grammar({
             field('return', $._maybe_option),
         ),
 
-        decorated_filter_declaration: $ => seq(
-            repeat1($.decorator),
-            $.filter_declaration,
-        ),
-
         condition_declaration: $ => seq(
             'condition',
             field('name', $.identifier),
             $._parameter_block,
-        ),
-
-        decorated_condition_declaration: $ => seq(
-            repeat1($.decorator),
-            $.condition_declaration,
         ),
 
         // ENUM
@@ -176,18 +188,32 @@ module.exports = grammar({
             ':',
             $._newline,
             $._indent,
+            optional($.inner_doc_block),
             $._enum_body,
             $._dedent,
         ),
 
         _enum_body: $ => repeat1(choice(
-            $.enum_case,
-            $.decorated_enum_case,
-            $.filter_declaration,
-            $.decorated_filter_declaration,
-            $.condition_declaration,
-            $.decorated_condition_declaration,
+            $.enum_child,
+            $.decorated_enum_child,
         )),
+
+        enum_child: $ => seq(
+            optional($.doc_block),
+            $._enum_child
+        ),
+
+        _enum_child: $ => choice(
+            $.enum_case,
+            $.filter_declaration,
+            $.condition_declaration,
+        ),
+
+        decorated_enum_child: $ => seq(
+            optional($.doc_block),
+            repeat1($.decorator),
+            $._enum_child,
+        ),
 
         enum_case: $ => seq(
             field("case", $.identifier),
@@ -209,18 +235,32 @@ module.exports = grammar({
             ':',
             $._newline,
             $._indent,
+            optional($.inner_doc_block),
             $._struct_body,
             $._dedent,
         ),
 
         _struct_body: $ => repeat1(choice(
-            $.struct_field,
-            $.decorated_struct_field,
-            $.filter_declaration,
-            $.decorated_filter_declaration,
-            $.condition_declaration,
-            $.decorated_condition_declaration,
+            $.struct_child,
+            $.decorated_struct_child,
         )),
+
+        struct_child: $ => seq(
+            optional($.doc_block),
+            $._struct_child
+        ),
+
+        _struct_child: $ => choice(
+            $.struct_field,
+            $.filter_declaration,
+            $.condition_declaration,
+        ),
+
+        decorated_struct_child: $ => seq(
+            optional($.doc_block),
+            repeat1($.decorator),
+            $._struct_child,
+        ),
 
         struct_field: $ => seq(
             $.identifier,
@@ -234,6 +274,40 @@ module.exports = grammar({
         ),
         /**********************************************************************/
         /* END blocks                                                         */
+        /**********************************************************************/
+
+        /**********************************************************************/
+        /* BEGIN doc blocks                                                   */
+        /**********************************************************************/
+        doc_block: $ => seq(
+            field("summary", $._doc_line),
+            optional(
+                seq(
+                    $._doc_blank,
+                    repeat1($._doc_line),
+                ),
+            ),
+        ),
+
+        inner_doc_block: $ => seq(
+            field("summary", $._inner_doc_line),
+            optional(
+                seq(
+                    $._inner_doc_blank,
+                    repeat1($._inner_doc_line),
+                ),
+            ),
+        ),
+
+        _doc_blank: $ => seq("##", $._newline),
+        _doc_line: $ => seq("##", optional(" "), $.doc_data, $._newline),
+
+        _inner_doc_blank: $ => seq("#!", $._newline),
+        _inner_doc_line: $ => seq("#!", optional(" "), $.doc_data, $._newline),
+
+        doc_data: _ => /.*/,
+        /**********************************************************************/
+        /* END doc blocks                                                     */
         /**********************************************************************/
 
         /**********************************************************************/
@@ -509,7 +583,7 @@ module.exports = grammar({
         false: _ => 'False',
         none: _ => 'None',
 
-        comment: _ => token(seq('#', /.*/)),
+        comment: _ => token(seq('#', /([^#!].*)?\n/)),
 
         line_continuation: _ => token(seq('\\', choice(seq(optional('\r'), '\n'), '\0'))),
 
