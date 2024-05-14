@@ -47,7 +47,12 @@
   "tree-sitter": [
     {
       "scope": "source.tplspec",
-      "injection-regex": "^tplspec$"
+      "file-types": [
+        "tplspec"
+      ],
+      "injection-regex": "^tplspec$",
+      "highlights": "queries/highlights.scm",
+      "injections": "queries/injections.scm"
     }
   ]
 }
