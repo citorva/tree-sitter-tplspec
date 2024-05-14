@@ -332,12 +332,6 @@ module.exports = grammar({
             ),
             $._newline,
         ),
-
-        _argument_block: $ => seq(
-            '(',
-            $.argument_list,
-            ')',
-        ),
         /**********************************************************************/
         /* END decorated                                                      */
         /**********************************************************************/
@@ -416,6 +410,22 @@ module.exports = grammar({
             $._argument_block,
         ),
 
+        _argument_block: $ => seq(
+            '(',
+            $.argument_list,
+            ')',
+        ),
+
+        argument_list: $ => prec.right(seq(
+            commaSep1($.argument),
+            optional(','),
+        )),
+
+        argument: $ => choice(
+            $.expression,
+            $.literal,
+        ),
+
         named_expression: $ => seq(
             field('name', $.identifier),
             ':=',
@@ -458,16 +468,6 @@ module.exports = grammar({
         not_operator: $ => prec(PREC.not, seq(
             'not',
             field('argument', $.expression),
-        )),
-
-        argument: $ => choice(
-            $.expression,
-            $.literal,
-        ),
-
-        argument_list: $ => prec.right(seq(
-            commaSep1($.argument),
-            optional(','),
         )),
 
         parameter: $ => seq(
