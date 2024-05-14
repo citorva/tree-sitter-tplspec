@@ -60,6 +60,21 @@
     }
   },
   {
+    "type": "array",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "literal",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "boolean_operator",
     "named": true,
     "fields": {
@@ -328,6 +343,29 @@
         },
         {
           "type": "filter_declaration",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "decorated_import_statement",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "decorator",
+          "named": true
+        },
+        {
+          "type": "import_from_statement",
+          "named": true
+        },
+        {
+          "type": "import_statement",
           "named": true
         }
       ]
@@ -781,6 +819,10 @@
       "required": true,
       "types": [
         {
+          "type": "array",
+          "named": true
+        },
+        {
           "type": "concatenated_string",
           "named": true
         },
@@ -859,6 +901,10 @@
         },
         {
           "type": "decorated_definition",
+          "named": true
+        },
+        {
+          "type": "decorated_import_statement",
           "named": true
         },
         {
