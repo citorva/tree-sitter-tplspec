@@ -1,9 +1,10 @@
+#include "tree_sitter/alloc.h"
 #include "tree_sitter/array.h"
 #include "tree_sitter/parser.h"
 
 #include <assert.h>
 #include <stdint.h>
-#include <stdio.h>
+#include <stdbool.h>
 #include <string.h>
 
 enum TokenType {
@@ -417,7 +418,7 @@ void *tree_sitter_tplspec_external_scanner_create() {
 #else
     assert(sizeof(Delimiter) == sizeof(char));
 #endif
-    Scanner *scanner = calloc(1, sizeof(Scanner));
+    Scanner *scanner = ts_calloc(1, sizeof(Scanner));
     array_init(&scanner->indents);
     array_init(&scanner->delimiters);
     tree_sitter_tplspec_external_scanner_deserialize(scanner, NULL, 0);
@@ -428,5 +429,5 @@ void tree_sitter_tplspec_external_scanner_destroy(void *payload) {
     Scanner *scanner = (Scanner *)payload;
     array_delete(&scanner->indents);
     array_delete(&scanner->delimiters);
-    free(scanner);
+    ts_free(scanner);
 }
