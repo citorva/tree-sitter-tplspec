@@ -138,7 +138,7 @@ module.exports = grammar({
             field('name', $.identifier),
             $._argument_block,
             '->',
-            field('return', $.identifier),
+            field('return', $.optional_type),
         ),
 
         _decorated_filter_declaration: $ => seq(
@@ -187,18 +187,30 @@ module.exports = grammar({
         ),
 
         // STRUCT
-        // struct_block : $ => seq(
-        //     'struct',
-        //     field('name', $.identifier),
-        //     ':',
-        //     $._indent,
-        //     field('body', $._struct_body),
-        //     $._dedent,
-        // ),
+        struct_block : $ => seq(
+            'struct',
+            field('name', $.identifier),
+            ':',
+            $._indent,
+            field('body', $._struct_body),
+            $._dedent,
+        ),
 
-        // _struct_body: $ => repeat(
+        _struct_body: $ => repeat1(choice(
+            $._struct_field,
+            $._decorated_struct_field,
+        )),
 
-        // ),
+        _struct_field: $ => seq(
+            $.identifier,
+            ':',
+            $.optional_type,
+        ),
+
+        _decorated_struct_field: $ => seq(
+            repeat1($.decorator),
+            $._struct_field,
+        ),
         /**********************************************************************/
         /* END blocks                                                         */
         /**********************************************************************/
@@ -231,6 +243,28 @@ module.exports = grammar({
         dotted_name: $ => prec(1, sep1($.identifier, '.')),
 
         identifier: _ => /[_\p{XID_Start}][_\p{XID_Continue}]*/,
+
+        type: $ => choice(
+            $.identifier,
+            $._builtin_types,
+        ),
+
+        optional_type: $ => choice(
+            $.type,
+            seq(
+                $.type,
+                '|',
+                $.none,
+            ),
+        ),
+
+        _builtin_types: _ => choice(
+            'string',
+            'bool',
+            'unsigned',
+            'integer',
+            'natural'
+        ),
 
         primary_expression: $ => choice(
             $.identifier,
@@ -312,7 +346,7 @@ module.exports = grammar({
         argument: $ => seq(
             field('name', $.identifier),
             ':',
-            field('type', $.identifier),
+            $.optional_type,
         ),
 
         argument_list: $ => prec.right(seq(
