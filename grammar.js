@@ -127,13 +127,13 @@ module.exports = grammar({
         ),
 
         _type_body: $ => repeat1(choice(
-            $.filter_declaration,
-            $.decorated_filter_declaration,
-            $.condition_declaration,
-            $.decorated_condition_declaration,
+            $._filter_declaration,
+            $._decorated_filter_declaration,
+            $._condition_declaration,
+            $._decorated_condition_declaration,
         )),
 
-        filter_declaration: $ => seq(
+        _filter_declaration: $ => seq(
             'filter',
             field('name', $.identifier),
             $._argument_block,
@@ -141,36 +141,50 @@ module.exports = grammar({
             field('return', $.identifier),
         ),
 
-        decorated_filter_declaration: $ => seq(
+        _decorated_filter_declaration: $ => seq(
             repeat1($.decorator),
-            $.filter_declaration,
+            $._filter_declaration,
         ),
 
-        condition_declaration: $ => seq(
+        _condition_declaration: $ => seq(
             'condition',
             field('name', $.identifier),
             $._argument_block,
         ),
 
-        decorated_condition_declaration: $ => seq(
+        _decorated_condition_declaration: $ => seq(
             repeat1($.decorator),
-            $.condition_declaration,
+            $._condition_declaration,
         ),
 
         // ENUM
-        // enum_block: $ => seq(
-        //     'enum',
-        //     field('name', $.identifier),
-        //     optional(field('repr', $._container_repr)),
-        //     ':',
-        //     $._indent,
-        //     field('body', $._enum_body),
-        //     $._dedent,
-        // ),
+        enum_block: $ => seq(
+            'enum',
+            field('name', $.identifier),
+            optional(field('repr', $._container_repr)),
+            ':',
+            $._indent,
+            field('body', $._enum_body),
+            $._dedent,
+        ),
 
-        // _enum_body: $ => repeat(
+        _enum_body: $ => repeat1(choice(
+            $._enum_case,
+            $._decorated_enum_case,
+        )),
 
-        // ),
+        _enum_case: $ => seq(
+            $.identifier,
+            optional(seq(
+                '=',
+                $._literal,
+            )),
+        ),
+
+        _decorated_enum_case: $ => seq(
+            repeat1($.decorator),
+            $._enum_case,
+        ),
 
         // STRUCT
         // struct_block : $ => seq(
@@ -220,13 +234,7 @@ module.exports = grammar({
 
         primary_expression: $ => choice(
             $.identifier,
-            $.string,
-            $.concatenated_string,
-            $.integer,
-            $.float,
-            $.true,
-            $.false,
-            $.none,
+            $._literal,
         ),
 
         argument_list: $ => seq(
@@ -334,6 +342,16 @@ module.exports = grammar({
         /**********************************************************************/
         /* BEGIN literals                                                     */
         /**********************************************************************/
+
+        _literal: $ => choice(
+            $.string,
+            $.concatenated_string,
+            $.integer,
+            $.float,
+            $.true,
+            $.false,
+            $.none,
+        ),
 
         string: $ => seq(
             $.string_start,
