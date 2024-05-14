@@ -45,6 +45,7 @@ module.exports = grammar({
 
         _statement: $ => choice(
             $._import_statement,
+            $.decorated_import_statement,
             $._compound_statement,
         ),
 
@@ -54,6 +55,11 @@ module.exports = grammar({
         _import_statement: $ => choice(
             $.import_statement,
             $.import_from_statement,
+        ),
+
+        decorated_import_statement: $ => seq(
+            repeat1($.decorator),
+            $._import_statement,
         ),
 
         import_statement: $ => seq(
