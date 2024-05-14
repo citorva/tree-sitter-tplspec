@@ -72,11 +72,11 @@
 
 [
   "map"
-  "array"
+  "list"
   "tuple"
   "boolean"
   "integer"
   "natural"
   "none"
   "string"
-] @type.builtin
+] @keyword
