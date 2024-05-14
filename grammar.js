@@ -10,6 +10,7 @@ module.exports = grammar({
     externals: $ => [
         $._newline,
         $._indent,
+        $._dedent,
         $.string_start,
         $._string_content,
         $.escape_interpolation,
@@ -30,7 +31,11 @@ module.exports = grammar({
     ],
 
     rules: {
-        module: $ => repeat($._statement),
+        module: $ => seq(
+            repeat($.decorator), // Module-level decorators
+            $._newline,
+            repeat($._statement),
+        ),
 
         _statement: $ => choice(
             $._import_statement,
@@ -90,34 +95,121 @@ module.exports = grammar({
         /* END import                                                         */
         /**********************************************************************/
 
+        /**********************************************************************/
+        /* BEGIN blocks                                                       */
+        /**********************************************************************/
         _compound_statement: $ => choice(
             $._container_definition,
-            $.decorated_definition,
+            $._decorated_definition,
         ),
+
+        _container_definition: $ => choice(
+            $.type_block,
+            // $.enum_block,
+            // $.struct_block,
+        ),
+
+        _container_repr: $ => seq(
+            '(',
+            $.identifier,
+            ')',
+        ),
+        
+        // TYPE
+        type_block: $ => seq(
+            'type',
+            field('name', $.identifier),
+            optional(field('repr', $._container_repr)),
+            ':',
+            $._indent,
+            field('body', $._type_body),
+            $._dedent,
+        ),
+
+        _type_body: $ => repeat1(choice(
+            $.filter_declaration,
+            $.decorated_filter_declaration,
+            $.condition_declaration,
+            $.decorated_condition_declaration,
+        )),
+
+        filter_declaration: $ => seq(
+            'filter',
+            field('name', $.identifier),
+            $._argument_block,
+            '->',
+            field('return', $.identifier),
+        ),
+
+        decorated_filter_declaration: $ => seq(
+            repeat1($.decorator),
+            $.filter_declaration,
+        ),
+
+        condition_declaration: $ => seq(
+            'condition',
+            field('name', $.identifier),
+            $._argument_block,
+        ),
+
+        decorated_condition_declaration: $ => seq(
+            repeat1($.decorator),
+            $.condition_declaration,
+        ),
+
+        // ENUM
+        // enum_block: $ => seq(
+        //     'enum',
+        //     field('name', $.identifier),
+        //     optional(field('repr', $._container_repr)),
+        //     ':',
+        //     $._indent,
+        //     field('body', $._enum_body),
+        //     $._dedent,
+        // ),
+
+        // _enum_body: $ => repeat(
+
+        // ),
+
+        // STRUCT
+        // struct_block : $ => seq(
+        //     'struct',
+        //     field('name', $.identifier),
+        //     ':',
+        //     $._indent,
+        //     field('body', $._struct_body),
+        //     $._dedent,
+        // ),
+
+        // _struct_body: $ => repeat(
+
+        // ),
+        /**********************************************************************/
+        /* END blocks                                                         */
+        /**********************************************************************/
 
         /**********************************************************************/
         /* BEGIN decorated                                                    */
         /**********************************************************************/
-        decorated_definition: $ => seq(
+        _decorated_definition: $ => seq(
             repeat1($.decorator),
             field('definition', $._container_definition),
         ),
 
         decorator: $ => seq(
             '@',
-            $.decorator_expression,
+            $._decorator_expression,
             $._newline,
         ),
 
-        decorator_expression: $ => seq(
+        _decorator_expression: $ => seq(
             field('function', $.primary_expression),
             optional(field('arguments', $.argument_list)),
         ),
         /**********************************************************************/
         /* END decorated                                                      */
         /**********************************************************************/
-
-        _container_definition: _ => '',
 
         /**********************************************************************/
         /* BEGIN common                                                       */
@@ -150,6 +242,20 @@ module.exports = grammar({
             $.boolean_operator,
             $.named_expression,
         ),
+
+        expression_list: $ => prec.right(seq(
+            $.expression,
+            choice(
+                ',',
+                seq(
+                    repeat1(seq(
+                        ',',
+                        $.expression,
+                    )),
+                    optional(','),
+                ),
+            ),
+        )),
 
         named_expression: $ => seq(
             field('name', $.identifier),
@@ -195,19 +301,31 @@ module.exports = grammar({
             field('argument', $.expression),
         )),
 
-        expression_list: $ => prec.right(seq(
-            $.expression,
+        argument: $ => seq(
+            field('name', $.identifier),
+            ':',
+            field('type', $.identifier),
+        ),
+
+        argument_list: $ => prec.right(seq(
+            $.argument,
             choice(
                 ',',
                 seq(
                     repeat1(seq(
                         ',',
-                        $.expression,
+                        $.argument,
                     )),
                     optional(','),
                 ),
             ),
         )),
+
+        _argument_block: $ => seq(
+            '(',
+            optional($.argument_list),
+            ')',
+        ),
 
         /**********************************************************************/
         /* END common                                                         */
